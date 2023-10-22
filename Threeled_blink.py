@@ -1,68 +1,75 @@
 # Import necessary libraries
 from tkinter import *
 import tkinter.font
-import RPi.GPIO as GPIO
 from gpiozero import LED
+import RPi.GPIO
 
 # Set the GPIO mode to BCM
-GPIO.setmode(GPIO.BCM)
+RPi.GPIO.setmode(RPi.GPIO.BCM)
 
-# Initialize GPIO pins using gpiozero
-red = LED(14)
-blue = LED(15)
-green = LED(18)
+# Initialize LED objects for Red, White, and Green LEDs
+Red = LED(16)
+White = LED(20)
+Green = LED(21)
 
-# Initialize the GUI window
+# Create a Tkinter window
 win = Tk()
-win.title("GUI Interface")  # Set the title of the window
-win.geometry("250x180")  # Set the window size
-myFont = tkinter.font.Font(family='Helvetica', size=12, weight="bold")
-uv = StringVar()
+win.title("LED BLINK")
+myFont = tkinter.font.Font(family='Arial', size=12, weight="bold")
 
-# Functions to control LEDs
-def ledRed():
-    red.on()
-    blue.off()
-    green.off()
+# Variable to store the selected LED color
+selected_color = StringVar()
 
-def ledBlue():
-    red.off()
-    blue.on()
-    green.off()
-def ledGreen():
-    red.off()
-    blue.off()
-    green.on()
+# LED Control Functions
 
-def allOn():
-    red.on()
-    blue.on()
-    green.on()
-def allOFF():
-    red.off()
-    blue.off()
-    green.off()
+# Function to control the LEDs based on the selected color
+def control_led():
+    color = selected_color.get()
+    if color == "Red":
+        if Red.is_lit:
+            Red.off()
+        else:
+            Red.on()
+            White.off()
+            Green.off()
+    elif color == "White":
+        if White.is_lit:
+            White.off()
+        else:
+            White on()
+            Red off()
+            Green off()
+    elif color == "Green":
+        if Green.is_lit:
+            Green off()
+        else:
+            Green.on()
+            Red.off()
+            White.off()
 
-# Function to clean up GPIO and close the window
+# Code for EXIT
 def close():
-    GPIO.cleanup()
+    RPi.GPIO.cleanup()
     win.destroy()
-# GUI Widgets
-Label(win, text="Choose an option!!", font=myFont, padx=14).pack()
-Radiobutton(win, text="Red", font=myFont, command=ledRed, bg='red', height=1, width=27, bd=3, variable=uv,
-            value="LED: Red").pack(anchor="w")
-Radiobutton(win, text="Blue", font=myFont, command=ledBlue, bg='blue', height=1, width=27, bd=3, variable=uv,
-            value="LED: Blue").pack(anchor="w")
-Radiobutton(win, text="Green", font=myFont, command=ledGreen, bg='green', height=1, width=27, bd=3, variable=uv,
-            value="LED: Green").pack(anchor="w")
-Radiobutton(win, text="All", font=myFont, command=allOn, bg='yellow', height=1, width=27, bd=3, variable=uv,
-            value="LED: All").pack(anchor="w")
-Radiobutton(win, text="None", font=myFont, command=allOFF, bg='purple', height=1, width=27, bd=3, variable=uv,
-            value="LED: None").pack(anchor="w")
-Button(win, text="Exit", font=myFont, command=close, bg='grey').pack(anchor="w")
 
-# Define a protocol to handle window close button
+# Create radio buttons for selecting LED colors
+
+redRadio = Radiobutton(win, text="Red LED", variable=selected_color, value="Red", font=myFont, command=control_led)
+redRadio.grid(row=0, column=1)
+
+whiteRadio = Radiobutton(win, text="White LED", variable=selected_color, value="White", font=myFont, command=control_led)
+whiteRadio.grid(row=0, column=3)
+
+greenRadio = Radiobutton(win, text="Green LED", variable=selected_color, value="Green", font=myFont, command=control_led)
+greenRadio.grid(row=0, column=6)
+
+# Create an "EXIT" button
+
+exitButton = Button(win, text="EXIT WINDOW", font=myFont, command=close, bg='red')
+exitButton.grid(row=2, column=3)
+
+# Set up an action to handle window close event
 win.protocol("WM_DELETE_WINDOW", close)
 
-# Start the GUI main loop
+# Start the Tkinter main event loop
 win.mainloop()
